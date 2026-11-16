@@ -1,0 +1,135 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Reusable hardened primitives
+    function isValidId(id) {
+      return id is string
+        && id.size() >= 1
+        && id.size() <= 128
+        && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'pdpravq@gmail.com'
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // 3. Entity validation blueprints
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['uid', 'email', 'role', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'email', 'role', 'createdAt'])
+        && isValidId(data.uid)
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.role in ['host', 'coordinator']
+        && data.createdAt is timestamp;
+    }
+
+    function isValidRsvp(data) {
+      return data.keys().hasAll([
+          'guestName',
+          'guestsCount',
+          'events',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'guestName',
+          'phone',
+          'guestsCount',
+          'events',
+          'blessing',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.guestName is string
+        && data.guestName.size() >= 1
+        && data.guestName.size() <= 120
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 30))
+        && data.guestsCount is int
+        && data.guestsCount >= 1
+        && data.guestsCount <= 20
+        && data.events is list
+        && data.events.size() >= 1
+        && data.events.size() <= 4
+        && data.events[0] is string
+        && data.events.hasOnly([
+          'Haldi Ceremony (22 Nov)',
+          'Wedding Muhurat (24 Nov)',
+          'Dinner & Reception (24 Nov)',
+          'Satyanarayan Pooja (26 Nov)'
+        ])
+        && (!('blessing' in data) || (data.blessing is string && data.blessing.size() <= 500))
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // 4. Admins collection (PII / Role protected)
+    match /admins/{adminId} {
+      allow get: if isValidId(adminId) && (isAdmin() || (isVerifiedUser() && request.auth.uid == adminId));
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && isValidId(adminId)
+        && isValidAdmin(incoming())
+        && incoming().uid == adminId
+        && incoming().createdAt == request.time;
+      allow update: if isAdmin()
+        && isValidId(adminId)
+        && isValidAdmin(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'role']);
+      allow delete: if isAdmin() && isValidId(adminId);
+    }
+
+    // 5. Wedding RSVPs & Blessings: public create without login; strictly host-only read/update/delete
+    match /rsvps/{rsvpId} {
+      allow get: if isValidId(rsvpId) && isAdmin();
+      allow list: if isAdmin();
+
+      allow create: if isValidId(rsvpId)
+        && isValidRsvp(incoming())
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isAdmin()
+        && isValidId(rsvpId)
+        && isValidRsvp(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'guestName',
+          'phone',
+          'guestsCount',
+          'events',
+          'blessing',
+          'updatedAt'
+        ]);
+
+      allow delete: if isValidId(rsvpId) && isAdmin();
+    }
+  }
+}

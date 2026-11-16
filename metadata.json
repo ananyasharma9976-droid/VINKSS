@@ -1,0 +1,6 @@
+{
+  "name": "Vinayak & Ruchi — Wedding Invitation",
+  "description": "Interactive heirloom wedding invitation folio for Vinayak Walekar and Ruchi Surve, Tuesday 24 November 2026 in Mumbai.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
