@@ -54,75 +54,6 @@ const MEMORIES: MemoryItem[] = [
     alt: 'Bride Ruchi in an emerald green gold-bordered Paithani saree with pearl Nath and mehndi',
     isPortrait: true,
   },
-  {
-    id: 'couple-mandap',
-    src: '/assets/aistudio/Watercolour_Wedding_Portrait_Beneath_Marigold_Arch_aa765282.png',
-    title: 'Under the Sacred Mandap',
-    marathiLabel: 'शुभमंगल मुहूर्त',
-    chapter: 'Chapter I · The Promise',
-    caption:
-      'Hand in hand beneath golden marigold garlands and jasmine torans, radiant in green Paithani silk and embroidered ivory sherwani.',
-    aspectClass: 'aspect-[3/4]',
-    alt: 'Watercolour portrait of Ruchi and Vinayak smiling together in varmala garlands beneath a marigold wedding arch',
-    isPortrait: true,
-  },
-  {
-    id: 'sakhar-puda',
-    src: '/assets/images/memory_sakhar_puda.png',
-    title: 'Sakhar Puda',
-    marathiLabel: 'साखरपुडा',
-    chapter: 'Chapter II · Betrothal',
-    caption:
-      'Golden silk saree drape, ceremonial silver bowl, and green bangles sealing two families together.',
-    aspectClass: 'aspect-[4/3]',
-    alt: 'Traditional Maharashtrian Sakhar Puda engagement keepsakes on gold zari silk',
-  },
-  {
-    id: 'haldi-hands',
-    src: '/assets/aistudio/Traditional_Indian_Wedding_Ceremony_0c2470f0.png',
-    title: 'Haldi & Mehndi Blessings',
-    marathiLabel: 'हळद समारंभ',
-    chapter: 'Chapter III · Joy & Turmeric',
-    caption:
-      'Golden turmeric on smiling cheeks, fragrant marigold petals, brass samai lamps, and intricate mehndi hands.',
-    aspectClass: 'aspect-square',
-    alt: 'Vinayak and Ruchi seated together during their Haldi ceremony with turmeric bowls, marigolds, and brass diyas',
-    isPortrait: true,
-  },
-  {
-    id: 'saptapadi-fire',
-    src: '/assets/aistudio/Traditional_Hindu_Wedding_Ceremony_0ba2b075.png',
-    title: 'Seven Steps Around Agni',
-    marathiLabel: 'सप्तपदी',
-    chapter: 'Chapter IV · Seven Vows',
-    caption:
-      'Seven sacred rice mounds beside the glowing copper Havan Kund beneath the marigold mandap as two paths become one.',
-    aspectClass: 'aspect-[3/4]',
-    alt: 'Ruchi and Vinayak taking vows beside the sacred Havan Kund fire and seven Saptapadi rice mounds',
-    isPortrait: true,
-  },
-  {
-    id: 'mangalsutra-gajra',
-    src: '/assets/images/memory_mangalsutra_gajra.png',
-    title: 'Vati Mangalsutra & Mogra',
-    marathiLabel: 'मंगळसूत्र व गजरा',
-    chapter: 'Chapter V · Heirloom',
-    caption:
-      'Gold Vati Mangalsutra braided with black beads and fresh white jasmine mogra upon Paithani weave.',
-    aspectClass: 'aspect-[4/3]',
-    alt: 'Maharashtrian gold Vati Mangalsutra and fresh jasmine mogra resting on crimson Paithani silk',
-  },
-  {
-    id: 'kelvan-feast',
-    src: '/assets/images/memory_kelvan_feast.png',
-    title: 'Kelvan & Family Feast',
-    marathiLabel: 'केळवण स्नेहभोजन',
-    chapter: 'Chapter VI · Warmth',
-    caption:
-      'Saffron shrikhand, crisp modak, and puran poli served on a banana leaf with brass katoris.',
-    aspectClass: 'aspect-square',
-    alt: 'Traditional Maharashtrian festive Kelvan meal served on a fresh banana leaf with brass bowls',
-  },
 ];
 
 interface MasonryTileProps {
@@ -140,7 +71,7 @@ function MasonryMemoryTile({ memory, index, onSelect }: MasonryTileProps) {
   });
 
   return (
-    <div ref={tileRef} className="break-inside-avoid mb-4 sm:mb-5">
+    <div ref={tileRef} className="h-full">
       <Interactive3DCard maxTilt={4}>
         <motion.button
           type="button"
@@ -258,13 +189,13 @@ export function MemoriesMasonryView() {
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-[#5c5346] max-w-sm">
-            From cherished portraits to Sakhar Puda and Saptapadi — tap any frame to inspect up close.
+            Cherished wedding portraits of Vinayak &amp; Ruchi — tap any frame to inspect up close.
           </p>
         </div>
       </ScrollReveal3D>
 
-      {/* Responsive CSS Masonry Grid */}
-      <div className="mt-6 columns-1 sm:columns-2 lg:columns-3 gap-4 sm:gap-5">
+      {/* Responsive 3-Portrait Gallery Grid */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
         {MEMORIES.map((memory, idx) => (
           <MasonryMemoryTile
             key={memory.id}
